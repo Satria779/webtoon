@@ -29,7 +29,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-sm border-b-4 border-white pt-safe pb-4 px-4 items-end flex justify-between">
         <div>
           <h1 className="text-4xl font-black tracking-tighter text-[var(--accent)] uppercase drop-shadow-[0_0_10px_rgba(204,255,0,0.5)] mt-4">
-            Novel<br/>Fliy
+            KOMIK<br/>
           </h1>
           <p className="text-xs font-mono lowercase tracking-widest opacity-80 mt-1">/source_webtoons/</p>
         </div>
@@ -133,9 +133,9 @@ export default function Home() {
       <footer className="mt-8 border-t-4 border-white pt-6 pb-24 md:pb-6 text-center flex flex-col items-center justify-center gap-2">
         <div className="font-mono text-sm opacity-60">DATA DARI WEBTOONS API</div>
         <div className="font-black uppercase tracking-widest text-[var(--accent)] text-lg">
-          SANN404 FORUM GROUP
+          
         </div>
-        <div className="font-mono text-xs opacity-50 mt-1">© 2026 NOVELFLIY PROJECT</div>
+        <div className="font-mono text-xs opacity-50 mt-1">© 2026 KOMIK</div>
       </footer>
       
       {/* MOBILE NAV BOTTOM (Brutalist) */}
