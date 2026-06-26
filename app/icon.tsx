@@ -22,7 +22,7 @@ export default function Icon() {
           fontWeight: 'bold',
         }}
       >
-        NF
+        K
       </div>
     ),
     { ...size }
