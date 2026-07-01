@@ -38,10 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-[#0a0a0a] text-white font-space antialiased">
         {children}
-        
-        {/* Komponen BugReport langsung di sini */}
         <BugReport />
-
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -120,18 +117,19 @@ function BugReport() {
 
   return (
     <>
-      {/* Tombol Lapor Bug */}
+      {/* TOMBOL LAPOR BUG - POSISI DI ATAS NAV MOBILE */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group"
+        className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group flex items-center gap-2 border border-white/10"
         aria-label="Lapor Bug"
       >
-        <Bug size={20} className="group-hover:rotate-12 transition-transform" />
+        <Bug size={16} className="group-hover:rotate-12 transition-transform" />
+        <span>Lapor Bug</span>
       </button>
 
-      {/* Modal */}
+      {/* MODAL */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="relative w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
