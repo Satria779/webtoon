@@ -13,18 +13,18 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'NovelFliy - Brutalist Webtoon Reader',
-  description: 'Baca webtoon trending dari sumber aslinya dengan UI brutalist yang estetik.',
+  title: 'KOMIK2 - Digital Comics Platform',
+  description: 'Temukan dan baca webtoon favoritmu dengan pengalaman membaca yang elegan.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'NovelFliy',
+    title: 'KOMIK2',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#000000',
+  themeColor: '#0a0a0a',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -32,11 +32,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} dark`}>
+    <html lang="id" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} dark`}>
       <head>
         <link rel="apple-touch-icon" href="/icon.png" />
       </head>
-      <body className="bg-black text-white font-space selection:bg-[var(--accent)] selection:text-black antialiased">
+      <body className="bg-[#0a0a0a] text-white font-space antialiased">
         {children}
         <script
           dangerouslySetInnerHTML={{
