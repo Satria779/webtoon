@@ -4,14 +4,43 @@
   --font-space: var(--font-space), "Space Grotesk", sans-serif;
   --font-mono: var(--font-mono), "JetBrains Mono", monospace;
   
-  --color-brand-green: #ccff00;
-  --color-brand-pink: #ff00ff;
-  --color-brand-blue: #00ffff;
-  --color-brand-orange: #ff4500;
+  --color-primary: #1a56db;
+  --color-primary-light: #3b82f6;
+  --color-primary-dark: #1e3a5f;
+  --color-accent: #2563eb;
 }
 
 @layer base {
   :root {
-    --accent: #ccff00;
+    --accent: #2563eb;
   }
+}
+
+/* Smooth scroll & selection */
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--color-primary-light);
+  color: white;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-light);
 }
