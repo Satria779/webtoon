@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import BugReport from './components/BugReport';
 import BottomNav from './components/BottomNav';
+
+// ❌ HAPUS import BugReport dari sini
+// import BugReport from './components/BugReport';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -40,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-[#0a0a0a] text-white font-space antialiased">
         {children}
-        <BugReport />
+        {/* ❌ HAPUS <BugReport /> dari sini */}
         <BottomNav />
         <script
           dangerouslySetInnerHTML={{
