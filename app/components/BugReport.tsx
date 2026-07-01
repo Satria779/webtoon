@@ -15,9 +15,9 @@ export default function BugReport() {
 
   const getEmail = () => {
     const parts = [
-      'a29taWsy',      
-      'd2Vi',          
-      'QGdtYWlsLmNvbQ==' 
+      'a29taWsy',
+      'd2Vi',
+      'QGdtYWlsLmNvbQ=='
     ];
     return parts.map(p => atob(p)).join('');
   };
@@ -72,27 +72,9 @@ Dilaporkan dari aplikasi KOMIK2
 
   return (
     <>
-      {/* TOMBOL LAPOR BUG - MOBILE */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group flex items-center gap-2 border border-white/20"
-        aria-label="Lapor Bug"
-      >
-        <Bug size={16} className="group-hover:rotate-12 transition-transform" />
-        <span>Lapor Bug</span>
-      </button>
+      {/* ❌ HAPUS SEMUA TOMBOL FLOATING DI SINI */}
 
-      {/* TOMBOL LAPOR BUG - DESKTOP */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="hidden md:flex fixed bottom-6 right-6 z-[9999] p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group items-center gap-2 border border-white/20"
-        aria-label="Lapor Bug"
-      >
-        <Bug size={20} className="group-hover:rotate-12 transition-transform" />
-        <span className="text-sm font-medium">Lapor Bug</span>
-      </button>
-
-      {/* MODAL */}
+      {/* MODAL - TETAP ADA */}
       {isOpen && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="relative w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden max-h-[90vh] overflow-y-auto">
