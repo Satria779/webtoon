@@ -24,7 +24,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0a0a0a] to-[#111827]">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0a0a0a] to-[#111827] pb-20 md:pb-0">
       {/* HEADER */}
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/10 pt-safe px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -171,22 +171,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-      
-      {/* MOBILE NAV */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/10 flex z-50 h-16">
-        <Link href="/" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-blue-400">
-          <span className="text-lg">🏠</span>
-          <span className="text-[10px] font-medium">Beranda</span>
-        </Link>
-        <Link href="/search" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 hover:text-white/80 transition-colors">
-          <span className="text-lg">🔍</span>
-          <span className="text-[10px] font-medium">Cari</span>
-        </Link>
-        <Link href="/favorites" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 hover:text-white/80 transition-colors">
-          <span className="text-lg">❤️</span>
-          <span className="text-[10px] font-medium">Favorit</span>
-        </Link>
-      </nav>
     </div>
   );
 }
