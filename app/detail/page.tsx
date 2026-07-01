@@ -16,7 +16,9 @@ function DetailContent() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
+  // Fetch detail & episodes
   useEffect(() => {
     if (!url) return;
     setLoading(true);
@@ -34,6 +36,41 @@ function DetailContent() {
         setLoading(false);
       });
   }, [url]);
+
+  // Cek status favorit
+  useEffect(() => {
+    if (detail) {
+      const saved = localStorage.getItem('komik2_favorites');
+      if (saved) {
+        try {
+          const favs = JSON.parse(saved);
+          const exists = favs.some((item: any) => item.url === url);
+          setIsFavorite(exists);
+        } catch {}
+      }
+    }
+  }, [detail, url]);
+
+  const toggleFavorite = () => {
+    if (!detail) return;
+    
+    const saved = localStorage.getItem('komik2_favorites');
+    let favs = saved ? JSON.parse(saved) : [];
+    
+    if (isFavorite) {
+      favs = favs.filter((item: any) => item.url !== url);
+    } else {
+      favs.push({
+        url: url,
+        title: detail.title,
+        thumbnail: detail.thumbnail,
+        genre: detail.genre || 'General',
+      });
+    }
+    
+    localStorage.setItem('komik2_favorites', JSON.stringify(favs));
+    setIsFavorite(!isFavorite);
+  };
 
   const loadMore = () => {
     if (!url || !hasMore || loadingMore) return;
@@ -103,7 +140,7 @@ function DetailContent() {
         
         <div className="relative flex flex-col md:flex-row gap-6">
           {/* Thumbnail */}
-          <div className="w-48 aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-white/10 bg-white/5 mx-auto md:mx-0">
+          <div className="w-48 aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-white/10 bg-white/5 mx-auto md:mx-0 relative">
             {detail.thumbnail ? (
               <Image 
                 src={`/api/image-proxy?url=${encodeURIComponent(detail.thumbnail)}`} 
@@ -163,6 +200,21 @@ function DetailContent() {
             <p className="text-sm text-white/60 leading-relaxed max-w-2xl border-l-2 border-blue-500/30 pl-4">
               {detail.synopsis || 'Tidak ada sinopsis tersedia.'}
             </p>
+
+            {/* Tombol Favorit */}
+            <button
+              onClick={toggleFavorite}
+              className={`mt-4 flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                isFavorite 
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30' 
+                  : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/10'
+              }`}
+            >
+              <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
+              <span className="text-sm font-medium">
+                {isFavorite ? 'Favorit' : 'Tambah Favorit'}
+              </span>
+            </button>
           </div>
         </div>
       </div>
