@@ -124,7 +124,7 @@ Dilaporkan dari aplikasi KOMIK2
 
   return (
     <>
-      {/* TOMBOL LAPOR BUG - VERSI MOBILE (DI ATAS NAV) */}
+      {/* TOMBOL LAPOR BUG - MOBILE (DI ATAS NAV) */}
       <button
         onClick={() => setIsOpen(true)}
         className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group flex items-center gap-2 border border-white/20"
@@ -134,7 +134,7 @@ Dilaporkan dari aplikasi KOMIK2
         <span>Lapor Bug</span>
       </button>
 
-      {/* TOMBOL LAPOR BUG - VERSI DESKTOP (POJOK KANAN BAWAH) */}
+      {/* TOMBOL LAPOR BUG - DESKTOP (POJOK KANAN BAWAH) */}
       <button
         onClick={() => setIsOpen(true)}
         className="hidden md:flex fixed bottom-6 right-6 z-[9999] p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group items-center gap-2 border border-white/20"
