@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Flame, Bell } from 'lucide-react';
+import { Search, Flame, Bell, BookOpen } from 'lucide-react';
 import Image from 'next/image';
 
 export default function Home() {
@@ -24,101 +24,128 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col pb-20 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0a0a0a] to-[#111827]">
       {/* HEADER */}
-      <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-sm border-b-4 border-white pt-safe pb-4 px-4 items-end flex justify-between">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter text-[var(--accent)] uppercase drop-shadow-[0_0_10px_rgba(204,255,0,0.5)] mt-4">
-            KOMIK<br/>
-          </h1>
-          <p className="text-xs font-mono lowercase tracking-widest opacity-80 mt-1">/source_webtoons/</p>
+      <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/10 pt-safe px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <BookOpen size={20} className="text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-white">
+              KOMIK<span className="text-blue-400">2</span>
+            </h1>
+            <p className="text-[10px] font-mono text-white/40 tracking-widest">• DIGITAL COMICS •</p>
+          </div>
         </div>
-        <button className="h-10 w-10 border-2 border-[var(--color-brand-pink)] flex items-center justify-center text-[var(--color-brand-pink)] hover:bg-[var(--color-brand-pink)] hover:text-black transition-colors relative" aria-label="Notifications">
-          <Bell size={20} />
-          <span className="absolute top-2 right-2 w-3 h-3 bg-[var(--color-brand-green)] border-2 border-black rounded-full animate-ping"></span>
-          <span className="absolute top-2 right-2 w-3 h-3 bg-[var(--color-brand-green)] border-2 border-black rounded-full"></span>
+        <button className="relative p-2 rounded-full hover:bg-white/5 transition-colors" aria-label="Notifications">
+          <Bell size={20} className="text-white/60 hover:text-white transition-colors" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full ring-2 ring-[#0a0a0a]"></span>
         </button>
       </header>
 
-      <main className="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col gap-8">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 flex flex-col gap-10">
         
-        {/* MOCK ADS */}
-        <div className="w-full bg-[var(--color-brand-pink)] text-black border-4 border-white p-3 uppercase font-bold text-center flex flex-col items-center justify-center animate-pulse">
-          <span className="text-xs font-mono bg-black text-white px-2 py-1 mb-1">SPONSORED_SLOT</span>
-          <span className="text-lg">BACA KOMIK TANPA BATAS</span>
-          <span className="opacity-80 text-xs">KLIK DI SINI SEKARANG!</span>
-        </div>
+        {/* HERO SECTION */}
+        <section className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600/20 via-blue-500/10 to-transparent border border-white/5 p-8 md:p-12">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <h2 className="text-3xl md:text-5xl font-bold text-white max-w-2xl">
+              Temukan Webtoon <br />
+              <span className="text-blue-400">Favoritmu</span>
+            </h2>
+            <p className="text-white/50 mt-3 max-w-md text-sm">
+              Jelajahi ribuan komik digital dari berbagai genre. Update setiap hari.
+            </p>
+          </div>
+        </section>
 
         {/* SEARCH */}
         <section>
-          <div className="flex border-4 border-white bg-black focus-within:border-[var(--accent)] transition-colors">
-            <input 
-              type="text" 
-              placeholder="CARI WEBTOON..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if(e.key === 'Enter' && searchQuery.trim()) {
-                  window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
-                }
-              }}
-              className="w-full bg-transparent text-white font-mono p-4 outline-none placeholder:text-gray-600"
-            />
-            <Link 
-              href={`/search?q=${encodeURIComponent(searchQuery.trim())}`}
-              className="p-4 bg-white text-black flex items-center justify-center hover:bg-[var(--accent)] transition-colors"
-            >
-              <Search size={24} className="font-bold" />
-            </Link>
+          <div className="relative">
+            <div className="absolute inset-0 bg-blue-500/5 rounded-2xl blur-xl"></div>
+            <div className="relative flex items-center bg-white/5 rounded-2xl border border-white/10 focus-within:border-blue-500/50 transition-all duration-300 overflow-hidden group">
+              <Search size={20} className="ml-4 text-white/30 group-focus-within:text-blue-400 transition-colors" />
+              <input 
+                type="text" 
+                placeholder="Cari judul webtoon..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if(e.key === 'Enter' && searchQuery.trim()) {
+                    window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+                  }
+                }}
+                className="flex-1 bg-transparent text-white font-sans p-4 outline-none placeholder:text-white/30"
+              />
+              <Link 
+                href={`/search?q=${encodeURIComponent(searchQuery.trim())}`}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30"
+              >
+                Cari
+              </Link>
+            </div>
           </div>
         </section>
 
         {/* TRENDING */}
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 border-b-2 border-white pb-2 mb-2">
-            <Flame className="text-[var(--color-brand-orange)]" size={28} />
-            <h2 className="text-3xl font-black uppercase">Trending NOW</h2>
+        <section className="flex flex-col gap-5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-500/10">
+              <Flame className="text-blue-400" size={22} />
+            </div>
+            <h2 className="text-xl font-bold text-white">Trending Sekarang</h2>
+            <span className="text-xs font-mono text-white/30 ml-auto">• LIVE •</span>
           </div>
           
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="aspect-[3/4] bg-neutral-900 border-2 border-neutral-700 animate-pulse"></div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="aspect-[2/3] rounded-xl bg-white/5 animate-pulse"></div>
               ))}
             </div>
           ) : trending.length === 0 ? (
-            <div className="p-8 border-4 border-dashed border-gray-600 font-mono text-center text-gray-500">
-              [NO TRENDING DATA FOUND]
+            <div className="p-12 rounded-2xl border border-white/5 bg-white/5 text-center text-white/30">
+              <p className="font-mono text-sm">Tidak ada data trending</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-4">
-              {trending.map((item, idx) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {trending.slice(0, 10).map((item, idx) => (
                 <Link 
                   key={idx} 
                   href={`/detail?url=${encodeURIComponent(item.url)}`}
-                  className="group relative border-2 border-transparent hover:border-[var(--accent)] transition-all overflow-hidden bg-neutral-900"
+                  className="group relative rounded-xl overflow-hidden bg-white/5 border border-white/5 hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10"
                 >
-                  <div className="aspect-[3/4] relative">
+                  <div className="aspect-[2/3] relative bg-gradient-to-b from-white/5 to-transparent">
                     {item.thumbnail ? (
                       <Image 
                         src={`/api/image-proxy?url=${encodeURIComponent(item.thumbnail)}`} 
                         alt={item.title} 
                         fill
                         unoptimized
-                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full bg-neutral-800 flex items-center justify-center font-mono text-xs opacity-50">NO_IMG</div>
+                      <div className="w-full h-full bg-white/5 flex items-center justify-center text-white/20 text-xs">
+                        No Image
+                      </div>
                     )}
-                    <div className="absolute top-0 right-0 bg-white text-black font-black p-2 text-xl translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute top-2 left-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">
                       #{idx + 1}
                     </div>
                   </div>
-                  <div className="p-2 border-t-2 border-neutral-800 group-hover:border-[var(--accent)] bg-black">
-                    <h3 className="font-bold line-clamp-1 group-hover:text-[var(--accent)] uppercase">{item.title}</h3>
-                    <div className="flex justify-between items-center mt-1">
-                      <span className="text-[10px] font-mono bg-white text-black px-1 uppercase">{item.genre || 'UNKNOWN'}</span>
-                      {item.likes && <span className="text-[10px] font-mono text-[var(--color-brand-pink)]">{item.likes} LIKES</span>}
+                  <div className="p-3">
+                    <h3 className="text-sm font-medium text-white line-clamp-1 group-hover:text-blue-400 transition-colors">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider bg-white/5 px-2 py-0.5 rounded">
+                        {item.genre || 'General'}
+                      </span>
+                      {item.likes && (
+                        <span className="text-[10px] text-blue-400 font-medium">❤️ {item.likes}</span>
+                      )}
                     </div>
                   </div>
                 </Link>
@@ -130,21 +157,34 @@ export default function Home() {
       </main>
       
       {/* FOOTER */}
-      <footer className="mt-8 border-t-4 border-white pt-6 pb-24 md:pb-6 text-center flex flex-col items-center justify-center gap-2">
-        <div className="font-mono text-sm opacity-60">DATA DARI WEBTOONS API</div>
-        <div className="font-black uppercase tracking-widest text-[var(--accent)] text-lg">
-          
+      <footer className="mt-12 border-t border-white/5 pt-8 pb-20 md:pb-8 text-center px-6">
+        <div className="flex flex-col items-center gap-3 max-w-md mx-auto">
+          <div className="flex items-center gap-2">
+            <BookOpen size={16} className="text-blue-400" />
+            <span className="text-sm font-medium text-white">KOMIK<span className="text-blue-400">2</span></span>
+          </div>
+          <p className="text-xs text-white/30 font-mono">Data dari berbagai sumber webtoon</p>
+          <div className="flex gap-4 text-xs text-white/20">
+            <span>© 2026</span>
+            <span>•</span>
+            <span>Digital Comics Platform</span>
+          </div>
         </div>
-        <div className="font-mono text-xs opacity-50 mt-1">© 2026 KOMIK</div>
       </footer>
       
-      {/* MOBILE NAV BOTTOM (Brutalist) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t-4 border-white flex z-50 h-14">
-        <Link href="/" className="flex-1 flex flex-col items-center justify-center bg-[var(--accent)] text-black transition-colors border-r-2 border-white">
-          <span className="font-bold text-sm uppercase tracking-widest">Home</span>
+      {/* MOBILE NAV */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/10 flex z-50 h-16">
+        <Link href="/" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-blue-400">
+          <span className="text-lg">🏠</span>
+          <span className="text-[10px] font-medium">Beranda</span>
         </Link>
-        <Link href="/search" className="flex-1 flex flex-col items-center justify-center hover:bg-[var(--color-brand-blue)] hover:text-black transition-colors border-l-2 border-white text-white">
-          <span className="font-bold text-sm uppercase tracking-widest">Search</span>
+        <Link href="/search" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 hover:text-white/80 transition-colors">
+          <span className="text-lg">🔍</span>
+          <span className="text-[10px] font-medium">Cari</span>
+        </Link>
+        <Link href="/favorites" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 hover:text-white/80 transition-colors">
+          <span className="text-lg">❤️</span>
+          <span className="text-[10px] font-medium">Favorit</span>
         </Link>
       </nav>
     </div>
