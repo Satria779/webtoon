@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ChevronDown, ImageOff } from 'lucide-react';
 
 function DetailContent() {
   const searchParams = useSearchParams();
@@ -17,8 +17,8 @@ function DetailContent() {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
-  // Fetch detail & episodes
   useEffect(() => {
     if (!url) return;
     setLoading(true);
@@ -37,7 +37,6 @@ function DetailContent() {
       });
   }, [url]);
 
-  // Cek status favorit
   useEffect(() => {
     if (detail) {
       const saved = localStorage.getItem('komik2_favorites');
@@ -132,6 +131,13 @@ function DetailContent() {
     );
   }
 
+  // Build image URL with fallback
+  const getImageUrl = (thumbnail: string) => {
+    if (!thumbnail) return null;
+    // Coba pake proxy dulu
+    return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
+  };
+
   return (
     <div className="flex flex-col gap-8">
       {/* HEADER INFO */}
@@ -142,13 +148,22 @@ function DetailContent() {
           {/* Thumbnail */}
           <div className="w-48 aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-white/10 bg-white/5 mx-auto md:mx-0 relative">
             {detail.thumbnail ? (
-              <Image 
-                src={`/api/image-proxy?url=${encodeURIComponent(detail.thumbnail)}`} 
-                alt={detail.title} 
-                fill
-                unoptimized
-                className="object-cover"
-              />
+              <>
+                <Image 
+                  src={getImageUrl(detail.thumbnail) || ''} 
+                  alt={detail.title} 
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  onError={() => setImageError(true)}
+                />
+                {imageError && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/5">
+                    <ImageOff size={32} className="text-white/20" />
+                    <span className="text-white/20 text-xs mt-2">Gagal muat</span>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center text-white/20 text-sm">
                 No Cover
@@ -246,6 +261,10 @@ function DetailContent() {
                     fill
                     unoptimized
                     className="object-cover"
+                    onError={(e) => {
+                      // Fallback: tampilkan placeholder
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-white/10 text-xs">
@@ -308,7 +327,6 @@ function DetailContent() {
 export default function DetailPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
-      {/* HEADER */}
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 px-4 md:px-6 py-3 flex items-center gap-4">
         <button 
           onClick={() => window.history.back()} 
