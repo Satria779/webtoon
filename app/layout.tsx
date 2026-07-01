@@ -59,10 +59,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 
-// ========== KOMPONEN BUG REPORT (LANGSUNG DI SINI) ==========
+// ========== KOMPONEN BUG REPORT ==========
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bug, X, Send, Mail, AlertCircle, CheckCircle } from 'lucide-react';
 
 function BugReport() {
@@ -73,6 +73,11 @@ function BugReport() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,17 +92,17 @@ function BugReport() {
 
     const email = 'komik2web@gmail.com';
     const body = `
-      🐞 LAPORAN BUG KOMIK2
-      ═══════════════════════
-      
-      📝 Judul: ${subject}
-      📄 Deskripsi: ${description}
-      🔗 URL: ${url || 'Tidak disebutkan'}
-      📱 User-Agent: ${navigator.userAgent}
-      📅 Tanggal: ${new Date().toLocaleString('id-ID')}
-      
-      ═══════════════════════
-      Dilaporkan dari aplikasi KOMIK2
+🐞 LAPORAN BUG KOMIK2
+═══════════════════════
+
+📝 Judul: ${subject}
+📄 Deskripsi: ${description}
+🔗 URL: ${url || 'Tidak disebutkan'}
+📱 User-Agent: ${navigator.userAgent}
+📅 Tanggal: ${new Date().toLocaleString('id-ID')}
+
+═══════════════════════
+Dilaporkan dari aplikasi KOMIK2
     `;
 
     const mailtoLink = `mailto:${email}?subject=[BUG] ${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -115,13 +120,24 @@ function BugReport() {
     }, 3000);
   };
 
+  // Jangan render di server
+  if (!isMounted) return null;
+
   return (
     <>
-      {/* TOMBOL LAPOR BUG - POSISI DI ATAS NAV MOBILE */}
+      {/* TOMBOL LAPOR BUG - POJOK KANAN BAWAH */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group flex items-center gap-2 border border-white/10"
+        className="fixed bottom-24 right-4 z-[9999] p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group flex items-center justify-center gap-2 border border-white/10"
         aria-label="Lapor Bug"
+      >
+        <Bug size={20} className="group-hover:rotate-12 transition-transform" />
+      </button>
+
+      {/* TOMBOL LAPOR BUG - VERSI TEKS (BIAR KELIHATAN) */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-24 left-4 z-[9999] px-4 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 group flex items-center gap-2 border border-white/10"
       >
         <Bug size={16} className="group-hover:rotate-12 transition-transform" />
         <span>Lapor Bug</span>
@@ -131,7 +147,6 @@ function BugReport() {
       {isOpen && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="relative w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden">
-            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-blue-500/20">
@@ -151,7 +166,6 @@ function BugReport() {
               </button>
             </div>
 
-            {/* Body */}
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
               {isSuccess ? (
                 <div className="flex flex-col items-center justify-center py-6 text-center">
