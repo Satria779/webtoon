@@ -1,10 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bug, X, Send, Mail, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Send, Mail, AlertCircle, CheckCircle } from 'lucide-react';
 
-export default function BugReport() {
-  const [isOpen, setIsOpen] = useState(false);
+interface BugReportProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function BugReport({ isOpen: externalIsOpen, onClose }: BugReportProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [url, setUrl] = useState('');
@@ -13,12 +18,18 @@ export default function BugReport() {
   const [error, setError] = useState('');
   const [isMounted, setIsMounted] = useState(false);
 
+  // Pake external atau internal
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = (val: boolean) => {
+    if (externalIsOpen !== undefined && onClose) {
+      if (!val) onClose();
+    } else {
+      setInternalIsOpen(val);
+    }
+  };
+
   const getEmail = () => {
-    const parts = [
-      'a29taWsy',
-      'd2Vi',
-      'QGdtYWlsLmNvbQ=='
-    ];
+    const parts = ['a29taWsy', 'd2Vi', 'QGdtYWlsLmNvbQ=='];
     return parts.map(p => atob(p)).join('');
   };
 
@@ -70,139 +81,130 @@ Dilaporkan dari aplikasi KOMIK2
 
   if (!isMounted) return null;
 
+  if (!isOpen) return null;
+
   return (
-    <>
-      {/* ❌ HAPUS SEMUA TOMBOL FLOATING DI SINI */}
-
-      {/* MODAL - TETAP ADA */}
-      {isOpen && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-white/10 sticky top-0 bg-[#0a0a0a] z-10">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-blue-500/20">
-                  <Bug size={18} className="text-blue-400" />
-                </div>
-                <h2 className="text-lg font-bold text-white">Lapor Bug</h2>
-              </div>
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  setError('');
-                  setIsSuccess(false);
-                }}
-                className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-white/40 hover:text-white"
-              >
-                <X size={18} />
-              </button>
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <div className="relative w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 border-b border-white/10 sticky top-0 bg-[#0a0a0a] z-10">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-blue-500/20">
+              <span className="text-blue-400">🐞</span>
             </div>
-
-            <form onSubmit={handleSubmit} className="p-4 space-y-4">
-              {isSuccess ? (
-                <div className="flex flex-col items-center justify-center py-6 text-center">
-                  <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-3">
-                    <CheckCircle size={32} className="text-green-400" />
-                  </div>
-                  <p className="text-white font-medium">Terima kasih!</p>
-                  <p className="text-white/40 text-sm font-mono mt-1">
-                    Email client akan terbuka. Silakan kirim laporanmu.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-white/60 mb-1.5">
-                      Judul Bug <span className="text-red-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={subject}
-                      onChange={(e) => setSubject(e.target.value)}
-                      placeholder="Contoh: Gambar tidak muncul"
-                      className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-blue-500/50 transition-colors"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-white/60 mb-1.5">
-                      Deskripsi Bug <span className="text-red-400">*</span>
-                    </label>
-                    <textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Jelaskan secara detail bug yang kamu temukan..."
-                      rows={4}
-                      className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-blue-500/50 transition-colors resize-none"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-white/60 mb-1.5">
-                      URL Halaman (opsional)
-                    </label>
-                    <input
-                      type="text"
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                      placeholder="https://komik2.com/..."
-                      className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-blue-500/50 transition-colors"
-                    />
-                  </div>
-
-                  <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                    <Mail size={16} className="text-blue-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-white/40">
-                      Laporan akan dikirim ke{' '}
-                      <span className="text-blue-400 font-mono">{EMAIL}</span>
-                      <br />
-                      Email client akan terbuka secara otomatis.
-                    </p>
-                  </div>
-
-                  {error && (
-                    <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-                      <AlertCircle size={16} />
-                      {error}
-                    </div>
-                  )}
-
-                  <div className="flex gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsOpen(false);
-                        setError('');
-                      }}
-                      className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors font-medium"
-                    >
-                      Batal
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                          Mengirim...
-                        </>
-                      ) : (
-                        <>
-                          <Send size={16} />
-                          Kirim Laporan
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </>
-              )}
-            </form>
+            <h2 className="text-lg font-bold text-white">Lapor Bug</h2>
           </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-white/40 hover:text-white"
+          >
+            <X size={18} />
+          </button>
         </div>
-      )}
-    </>
+
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {isSuccess ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-3">
+                <CheckCircle size={32} className="text-green-400" />
+              </div>
+              <p className="text-white font-medium">Terima kasih!</p>
+              <p className="text-white/40 text-sm font-mono mt-1">
+                Email client akan terbuka. Silakan kirim laporanmu.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-white/60 mb-1.5">
+                  Judul Bug <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="Contoh: Gambar tidak muncul"
+                  className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-blue-500/50 transition-colors"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white/60 mb-1.5">
+                  Deskripsi Bug <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Jelaskan secara detail bug yang kamu temukan..."
+                  rows={4}
+                  className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-blue-500/50 transition-colors resize-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white/60 mb-1.5">
+                  URL Halaman (opsional)
+                </label>
+                <input
+                  type="text"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://komik2.com/..."
+                  className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-blue-500/50 transition-colors"
+                />
+              </div>
+
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                <Mail size={16} className="text-blue-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-white/40">
+                  Laporan akan dikirim ke{' '}
+                  <span className="text-blue-400 font-mono">{EMAIL}</span>
+                  <br />
+                  Email client akan terbuka secara otomatis.
+                </p>
+              </div>
+
+              {error && (
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                  <AlertCircle size={16} />
+                  {error}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setError('');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors font-medium"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      Mengirim...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      Kirim Laporan
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
+          )}
+        </form>
+      </div>
+    </div>
   );
 }
