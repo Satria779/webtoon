@@ -75,6 +75,17 @@ function BugReport() {
   const [error, setError] = useState('');
   const [isMounted, setIsMounted] = useState(false);
 
+  const getEmail = () => {
+    const parts = [
+      'a29taWsy',      
+      'd2Vi',          
+      'QGdtYWlsLmNvbQ==' 
+    ];
+    return parts.map(p => atob(p)).join('');
+  };
+
+  const EMAIL = getEmail();
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -90,7 +101,6 @@ function BugReport() {
     setIsSubmitting(true);
     setError('');
 
-    const email = 'komik2web@gmail.com';
     const body = `
 🐞 LAPORAN BUG KOMIK2
 ═══════════════════════
@@ -105,7 +115,7 @@ function BugReport() {
 Dilaporkan dari aplikasi KOMIK2
     `;
 
-    const mailtoLink = `mailto:${email}?subject=[BUG] ${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoLink = `mailto:${EMAIL}?subject=[BUG] ${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
     
     setIsSubmitting(false);
@@ -225,7 +235,7 @@ Dilaporkan dari aplikasi KOMIK2
                     <Mail size={16} className="text-blue-400 shrink-0 mt-0.5" />
                     <p className="text-xs text-white/40">
                       Laporan akan dikirim ke{' '}
-                      <span className="text-blue-400 font-mono">komik2web@gmail.com</span>
+                      <span className="text-blue-400 font-mono">{EMAIL}</span>
                       <br />
                       Email client akan terbuka secara otomatis.
                     </p>
