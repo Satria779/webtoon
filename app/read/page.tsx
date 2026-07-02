@@ -99,7 +99,7 @@ function ReadContent() {
         </span>
       </div>
 
-      {/* Images Container */}
+      {/* Images Container - TANPA PADDING BOTTOM */}
       <div className="w-full max-w-2xl">
         {images.map((img, idx) => (
           <div key={idx} className="relative">
@@ -109,7 +109,6 @@ function ReadContent() {
               className="w-full h-auto block"
               loading="lazy"
               onLoad={() => {
-                // Update current page when image loads
                 const rect = document.getElementById(`page-${idx}`)?.getBoundingClientRect();
                 if (rect && rect.top >= 0 && rect.top < window.innerHeight) {
                   setCurrentPage(idx);
@@ -117,7 +116,6 @@ function ReadContent() {
               }}
               id={`page-${idx}`}
             />
-            {/* Page Number */}
             <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white/40 text-[10px] font-mono backdrop-blur-sm">
               {idx + 1}
             </div>
@@ -157,7 +155,7 @@ function ReadContent() {
         </button>
       </div>
 
-      {/* Scroll to Top Button (mobile friendly) */}
+      {/* Scroll to Top Button */}
       {showScrollTop && (
         <button 
           onClick={scrollToTop}
@@ -174,7 +172,6 @@ function ReadContent() {
 export default function ReadPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
-      {/* HEADER */}
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 px-4 py-3 flex items-center gap-4">
         <button 
           onClick={() => window.history.back()} 
@@ -201,4 +198,4 @@ export default function ReadPage() {
       </main>
     </div>
   );
-              }
+}
