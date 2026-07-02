@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-// Import useState buat buka modal langsung
 import { useState } from 'react';
 import BugReport from './BugReport';
 
@@ -18,6 +16,11 @@ export default function BottomNav() {
   const openBugReport = () => {
     setIsBugOpen(true);
   };
+
+  // ❌ SEMBUNYIKAN NAVIGASI DI HALAMAN READ
+  if (pathname === '/read') {
+    return null;
+  }
 
   return (
     <>
@@ -37,7 +40,6 @@ export default function BottomNav() {
           <span className="text-[10px] font-medium">Favorit</span>
         </Link>
         
-        {/* TOMBOL LAPOR - LANGSUNG PAKAI setIsBugOpen */}
         <button
           onClick={openBugReport}
           className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 hover:text-white/80 transition-colors"
@@ -47,7 +49,6 @@ export default function BottomNav() {
         </button>
       </nav>
 
-      {/* MODAL BUG REPORT LANGSUNG DI SINI */}
       <BugReport isOpen={isBugOpen} onClose={() => setIsBugOpen(false)} />
     </>
   );
