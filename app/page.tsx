@@ -14,7 +14,15 @@ export default function Home() {
     fetch('/api/trending?day=trending')
       .then(res => res.json())
       .then(data => {
-        setTrending(data.items || []);
+        const actionItems = (data.items || []).filter((item: any) => {
+          const genre = item.genre?.toLowerCase() || '';
+          return genre.includes('action') || 
+                 genre.includes('aksi') ||
+                 genre.includes('fighting') ||
+                 genre.includes('martial') ||
+                 genre.includes('battle');
+        });
+        setTrending(actionItems);
         setLoading(false);
       })
       .catch(err => {
@@ -24,8 +32,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0a0a0a] to-[#111827] pb-20 md:pb-0">
-      {/* HEADER */}
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0a0a0a] to-[#111827] pb-24 md:pb-8">
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/10 pt-safe px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -45,8 +52,6 @@ export default function Home() {
       </header>
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 flex flex-col gap-10">
-        
-        {/* HERO SECTION */}
         <section className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600/20 via-blue-500/10 to-transparent border border-white/5 p-8 md:p-12">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative">
@@ -60,7 +65,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SEARCH */}
         <section>
           <div className="relative">
             <div className="absolute inset-0 bg-blue-500/5 rounded-2xl blur-xl"></div>
@@ -88,14 +92,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* TRENDING */}
         <section className="flex flex-col gap-5">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-500/10">
-              <Flame className="text-blue-400" size={22} />
+            <div className="p-2 rounded-lg bg-red-500/10">
+              <Flame className="text-red-400" size={22} />
             </div>
-            <h2 className="text-xl font-bold text-white">Trending Sekarang</h2>
-            <span className="text-xs font-mono text-white/30 ml-auto">• LIVE •</span>
+            <h2 className="text-xl font-bold text-white">Action Trending 🔥</h2>
+            <span className="text-xs font-mono text-white/30 ml-auto">• ACTION •</span>
           </div>
           
           {loading ? (
@@ -106,7 +109,7 @@ export default function Home() {
             </div>
           ) : trending.length === 0 ? (
             <div className="p-12 rounded-2xl border border-white/5 bg-white/5 text-center text-white/30">
-              <p className="font-mono text-sm">Tidak ada data trending</p>
+              <p className="font-mono text-sm">Tidak ada komik action trending</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -114,7 +117,7 @@ export default function Home() {
                 <Link 
                   key={idx} 
                   href={`/detail?url=${encodeURIComponent(item.url)}`}
-                  className="group relative rounded-xl overflow-hidden bg-white/5 border border-white/5 hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10"
+                  className="group relative rounded-xl overflow-hidden bg-white/5 border border-white/5 hover:border-red-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-red-500/10"
                 >
                   <div className="aspect-[2/3] relative bg-gradient-to-b from-white/5 to-transparent">
                     {item.thumbnail ? (
@@ -131,20 +134,23 @@ export default function Home() {
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="absolute top-2 left-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                    <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">
                       #{idx + 1}
+                    </div>
+                    <div className="absolute top-2 right-2 bg-red-500/80 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
+                      ACTION
                     </div>
                   </div>
                   <div className="p-3">
-                    <h3 className="text-sm font-medium text-white line-clamp-1 group-hover:text-blue-400 transition-colors">
+                    <h3 className="text-sm font-medium text-white line-clamp-1 group-hover:text-red-400 transition-colors">
                       {item.title}
                     </h3>
                     <div className="flex items-center justify-between mt-1.5">
                       <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider bg-white/5 px-2 py-0.5 rounded">
-                        {item.genre || 'General'}
+                        {item.genre || 'Action'}
                       </span>
                       {item.likes && (
-                        <span className="text-[10px] text-blue-400 font-medium">❤️ {item.likes}</span>
+                        <span className="text-[10px] text-red-400 font-medium">❤️ {item.likes}</span>
                       )}
                     </div>
                   </div>
@@ -153,10 +159,8 @@ export default function Home() {
             </div>
           )}
         </section>
-
       </main>
       
-      {/* FOOTER */}
       <footer className="mt-12 border-t border-white/5 pt-8 pb-20 md:pb-8 text-center px-6">
         <div className="flex flex-col items-center gap-3 max-w-md mx-auto">
           <div className="flex items-center gap-2">
