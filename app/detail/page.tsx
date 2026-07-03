@@ -131,21 +131,17 @@ function DetailContent() {
     );
   }
 
-  // Build image URL with fallback
   const getImageUrl = (thumbnail: string) => {
     if (!thumbnail) return null;
-    // Coba pake proxy dulu
     return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
   };
 
   return (
     <div className="flex flex-col gap-8">
-      {/* HEADER INFO */}
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white/5 to-transparent border border-white/5 p-6 md:p-8">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         
         <div className="relative flex flex-col md:flex-row gap-6">
-          {/* Thumbnail */}
           <div className="w-48 aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-white/10 bg-white/5 mx-auto md:mx-0 relative">
             {detail.thumbnail ? (
               <>
@@ -172,7 +168,6 @@ function DetailContent() {
           </div>
 
           <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
-            {/* Status Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-medium mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
               {detail.status || 'Ongoing'}
@@ -185,7 +180,6 @@ function DetailContent() {
               {detail.author || 'Unknown Author'}
             </p>
             
-            {/* Stats */}
             <div className="flex flex-wrap items-center gap-3 mb-4 justify-center md:justify-start">
               {detail.genre && (
                 <span className="px-3 py-1 rounded-full bg-white/5 text-white/60 text-xs font-mono">
@@ -216,7 +210,6 @@ function DetailContent() {
               {detail.synopsis || 'Tidak ada sinopsis tersedia.'}
             </p>
 
-            {/* Tombol Favorit */}
             <button
               onClick={toggleFavorite}
               className={`mt-4 flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${
@@ -234,7 +227,6 @@ function DetailContent() {
         </div>
       </div>
 
-      {/* EPISODE LIST */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -262,7 +254,6 @@ function DetailContent() {
                     unoptimized
                     className="object-cover"
                     onError={(e) => {
-                      // Fallback: tampilkan placeholder
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
@@ -326,7 +317,7 @@ function DetailContent() {
 
 export default function DetailPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a] pb-24 md:pb-8">
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 px-4 md:px-6 py-3 flex items-center gap-4">
         <button 
           onClick={() => window.history.back()} 
