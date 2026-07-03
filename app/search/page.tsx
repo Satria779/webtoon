@@ -50,7 +50,6 @@ function SearchContent() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Search Form */}
       <form onSubmit={handleSearch} className="relative">
         <div className="flex items-center bg-white/5 rounded-2xl border border-white/10 focus-within:border-blue-500/50 transition-all duration-300 overflow-hidden group">
           <SearchIcon size={20} className="ml-4 text-white/30 group-focus-within:text-blue-400 transition-colors flex-shrink-0" />
@@ -80,7 +79,6 @@ function SearchContent() {
         </div>
       </form>
 
-      {/* Search Tips */}
       {!initialQ && !results && !loading && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-4">
@@ -106,7 +104,6 @@ function SearchContent() {
         </div>
       ) : results ? (
         <div className="space-y-5">
-          {/* Results Header */}
           <div className="flex items-center justify-between border-b border-white/5 pb-3">
             <div className="flex items-center gap-2">
               <BookOpen size={16} className="text-blue-400" />
@@ -129,7 +126,6 @@ function SearchContent() {
             </div>
           )}
 
-          {/* Results List */}
           <div className="space-y-3">
             {results.items?.map((item: any, idx: number) => (
               <Link 
@@ -188,8 +184,7 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
-      {/* HEADER */}
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a] pb-24 md:pb-8">
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 px-4 py-3 flex items-center gap-4">
         <Link 
           href="/" 
@@ -214,22 +209,6 @@ export default function SearchPage() {
           <SearchContent />
         </Suspense>
       </main>
-
-      {/* MOBILE NAV */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/10 flex z-50 h-16">
-        <Link href="/" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 hover:text-white/80 transition-colors">
-          <span className="text-lg">🏠</span>
-          <span className="text-[10px] font-medium">Beranda</span>
-        </Link>
-        <Link href="/search" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-blue-400">
-          <span className="text-lg">🔍</span>
-          <span className="text-[10px] font-medium">Cari</span>
-        </Link>
-        <Link href="/favorites" className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 hover:text-white/80 transition-colors">
-          <span className="text-lg">❤️</span>
-          <span className="text-[10px] font-medium">Favorit</span>
-        </Link>
-      </nav>
     </div>
   );
 }
