@@ -83,7 +83,6 @@ function ReadContent() {
 
   return (
     <div className="flex flex-col items-center bg-[#0a0a0a] min-h-screen">
-      {/* Reading Progress Bar */}
       <div className="sticky top-0 z-40 w-full bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 px-4 py-2 flex items-center justify-between">
         <span className="text-xs text-white/30 font-mono">
           Halaman {currentPage + 1} / {images.length}
@@ -99,7 +98,6 @@ function ReadContent() {
         </span>
       </div>
 
-      {/* Images Container - TANPA PADDING BOTTOM */}
       <div className="w-full max-w-2xl">
         {images.map((img, idx) => (
           <div key={idx} className="relative">
@@ -123,7 +121,6 @@ function ReadContent() {
         ))}
       </div>
 
-      {/* Quick Navigation */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-[#0a0a0a]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-2 py-2 shadow-2xl">
         <button 
           onClick={scrollToTop}
@@ -155,7 +152,6 @@ function ReadContent() {
         </button>
       </div>
 
-      {/* Scroll to Top Button */}
       {showScrollTop && (
         <button 
           onClick={scrollToTop}
@@ -171,7 +167,7 @@ function ReadContent() {
 
 export default function ReadPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a] pb-20">
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 px-4 py-3 flex items-center gap-4">
         <button 
           onClick={() => window.history.back()} 
