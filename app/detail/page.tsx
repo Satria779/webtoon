@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ChevronDown, ImageOff, RefreshCw, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ImageOff, RefreshCw, AlertCircle } from 'lucide-react';
 
 function DetailContent() {
   const searchParams = useSearchParams();
@@ -21,7 +21,6 @@ function DetailContent() {
   const [totalEpisodes, setTotalEpisodes] = useState(0);
   const [usingScrape, setUsingScrape] = useState(false);
 
-  // Fungsi fetch data
   const fetchData = async (isRefresh = false) => {
     if (!url) return;
     
@@ -33,19 +32,17 @@ function DetailContent() {
     setLoading(true);
     
     try {
-      // === ATTEMPT 1: Scrape semua episode pake API Internal Webtoon ===
-      console.log('🔄 Attempting to fetch all episodes via Webtoon API...');
+      console.log('🔄 Fetching all episodes...');
       const scrapeRes = await fetch(`/api/scrape-all?url=${encodeURIComponent(url)}`);
       const scrapeData = await scrapeRes.json();
       
       if (scrapeData.success && scrapeData.episodes.length > 0) {
-        console.log(`✅ API successful: ${scrapeData.episodes.length} episodes`);
+        console.log(`✅ Success: ${scrapeData.episodes.length} episodes`);
         setEpisodes(scrapeData.episodes);
         setTotalEpisodes(scrapeData.total);
         setUsingScrape(true);
         setLastUpdated(new Date().toLocaleString('id-ID'));
         
-        // Ambil detail dari API lama
         const detailRes = await fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=1`);
         const detailData = await detailRes.json();
         setDetail(detailData);
@@ -55,7 +52,6 @@ function DetailContent() {
         return;
       }
       
-      // === ATTEMPT 2: Fallback ke API lama ===
       console.log('🔄 Fallback to legacy API...');
       const res = await fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=1`);
       const data = await res.json();
@@ -66,7 +62,7 @@ function DetailContent() {
         setTotalEpisodes(data.count || data.episodesList?.length || 0);
         setUsingScrape(false);
         setLastUpdated(new Date().toLocaleString('id-ID'));
-        setScrapeError('Menampilkan episode terbatas. Scrape gagal.');
+        setScrapeError('Menampilkan episode terbatas.');
       } else {
         throw new Error('No data from legacy API');
       }
@@ -82,13 +78,11 @@ function DetailContent() {
     }
   };
 
-  // Load awal
   useEffect(() => {
     if (!url) return;
     fetchData();
   }, [url]);
 
-  // Cek favorit
   useEffect(() => {
     if (detail) {
       const saved = localStorage.getItem('komik2_favorites');
@@ -134,7 +128,6 @@ function DetailContent() {
     return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
   };
 
-  // Loading
   if (loading) {
     return (
       <div className="animate-pulse space-y-6">
@@ -155,7 +148,6 @@ function DetailContent() {
     );
   }
 
-  // No URL
   if (!url) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -167,7 +159,6 @@ function DetailContent() {
     );
   }
 
-  // No detail
   if (!detail) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -187,7 +178,6 @@ function DetailContent() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* HEADER INFO */}
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white/5 to-transparent border border-white/5 p-6 md:p-8">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         
@@ -277,7 +267,6 @@ function DetailContent() {
         </div>
       </div>
 
-      {/* EPISODE LIST */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -311,7 +300,6 @@ function DetailContent() {
           </div>
         </div>
 
-        {/* Error */}
         {scrapeError && (
           <div className="flex items-center gap-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm mb-4">
             <AlertCircle size={16} />
@@ -349,11 +337,6 @@ function DetailContent() {
                   </h3>
                   <div className="flex items-center gap-3 text-xs text-white/30 mt-0.5">
                     {ep.date && <span>{ep.date}</span>}
-                    {ep.isNew && (
-                      <span className="text-[8px] font-bold text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded">
-                        NEW
-                      </span>
-                    )}
                   </div>
                 </div>
                 
