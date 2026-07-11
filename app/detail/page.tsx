@@ -33,13 +33,13 @@ function DetailContent() {
     setLoading(true);
     
     try {
-      // === ATTEMPT 1: Scrape semua episode ===
-      console.log('🔄 Attempting to scrape all episodes...');
+      // === ATTEMPT 1: Scrape semua episode pake API Internal Webtoon ===
+      console.log('🔄 Attempting to fetch all episodes via Webtoon API...');
       const scrapeRes = await fetch(`/api/scrape-all?url=${encodeURIComponent(url)}`);
       const scrapeData = await scrapeRes.json();
       
       if (scrapeData.success && scrapeData.episodes.length > 0) {
-        console.log(`✅ Scrape successful: ${scrapeData.episodes.length} episodes`);
+        console.log(`✅ API successful: ${scrapeData.episodes.length} episodes`);
         setEpisodes(scrapeData.episodes);
         setTotalEpisodes(scrapeData.total);
         setUsingScrape(true);
@@ -349,6 +349,11 @@ function DetailContent() {
                   </h3>
                   <div className="flex items-center gap-3 text-xs text-white/30 mt-0.5">
                     {ep.date && <span>{ep.date}</span>}
+                    {ep.isNew && (
+                      <span className="text-[8px] font-bold text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded">
+                        NEW
+                      </span>
+                    )}
                   </div>
                 </div>
                 
