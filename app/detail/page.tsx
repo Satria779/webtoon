@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ChevronDown, ImageOff, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ChevronDown, ImageOff, RefreshCw, AlertCircle } from 'lucide-react';
 
 function DetailContent() {
   const searchParams = useSearchParams();
@@ -13,38 +13,69 @@ function DetailContent() {
   const [detail, setDetail] = useState<any>(null);
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [scrapeError, setScrapeError] = useState<string | null>(null);
+  const [totalEpisodes, setTotalEpisodes] = useState(0);
+  const [usingScrape, setUsingScrape] = useState(false);
 
   // Fungsi fetch data
-  const fetchData = async (pageNum: number, isRefresh = false) => {
+  const fetchData = async (isRefresh = false) => {
     if (!url) return;
     
     if (isRefresh) {
       setIsRefreshing(true);
     }
     
+    setScrapeError(null);
+    setLoading(true);
+    
     try {
-      const res = await fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=${pageNum}`);
-      const data = await res.json();
+      // === ATTEMPT 1: Scrape semua episode ===
+      console.log('🔄 Attempting to scrape all episodes...');
+      const scrapeRes = await fetch(`/api/scrape-all?url=${encodeURIComponent(url)}`);
+      const scrapeData = await scrapeRes.json();
       
-      if (pageNum === 1) {
-        setDetail(data);
-        setEpisodes(data.episodesList || []);
+      if (scrapeData.success && scrapeData.episodes.length > 0) {
+        console.log(`✅ Scrape successful: ${scrapeData.episodes.length} episodes`);
+        setEpisodes(scrapeData.episodes);
+        setTotalEpisodes(scrapeData.total);
+        setUsingScrape(true);
         setLastUpdated(new Date().toLocaleString('id-ID'));
-      } else {
-        setEpisodes(prev => [...prev, ...(data.episodesList || [])]);
+        
+        // Ambil detail dari API lama
+        const detailRes = await fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=1`);
+        const detailData = await detailRes.json();
+        setDetail(detailData);
+        
+        setLoading(false);
+        setIsRefreshing(false);
+        return;
       }
       
-      setHasMore(data.hasNext);
-      setPage(pageNum);
-    } catch (err) {
-      console.error(err);
+      // === ATTEMPT 2: Fallback ke API lama ===
+      console.log('🔄 Fallback to legacy API...');
+      const res = await fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=1`);
+      const data = await res.json();
+      
+      if (data && data.episodesList) {
+        setDetail(data);
+        setEpisodes(data.episodesList || []);
+        setTotalEpisodes(data.count || data.episodesList?.length || 0);
+        setUsingScrape(false);
+        setLastUpdated(new Date().toLocaleString('id-ID'));
+        setScrapeError('Menampilkan episode terbatas. Scrape gagal.');
+      } else {
+        throw new Error('No data from legacy API');
+      }
+      
+    } catch (err: any) {
+      console.error('❌ Error:', err);
+      setScrapeError(err.message || 'Gagal memuat data. Coba lagi nanti.');
+      setEpisodes([]);
+      setTotalEpisodes(0);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -54,8 +85,7 @@ function DetailContent() {
   // Load awal
   useEffect(() => {
     if (!url) return;
-    setLoading(true);
-    fetchData(1);
+    fetchData();
   }, [url]);
 
   // Cek favorit
@@ -72,11 +102,10 @@ function DetailContent() {
     }
   }, [detail, url]);
 
-  // Refresh / Update
   const handleRefresh = () => {
     if (!url) return;
     setEpisodes([]);
-    fetchData(1, true);
+    fetchData(true);
   };
 
   const toggleFavorite = () => {
@@ -100,35 +129,12 @@ function DetailContent() {
     setIsFavorite(!isFavorite);
   };
 
-  const loadMore = () => {
-    if (!url || !hasMore || loadingMore) return;
-    setLoadingMore(true);
-    const nextPage = page + 1;
-    fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=${nextPage}`)
-      .then(res => res.json())
-      .then(data => {
-        setEpisodes(prev => [...prev, ...(data.episodesList || [])]);
-        setHasMore(data.hasNext);
-        setPage(nextPage);
-        setLoadingMore(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoadingMore(false);
-      });
+  const getImageUrl = (thumbnail: string) => {
+    if (!thumbnail) return null;
+    return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
   };
 
-  if (!url) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-          <span className="text-2xl">⚠️</span>
-        </div>
-        <p className="text-white/40 font-mono text-sm">URL tidak ditemukan</p>
-      </div>
-    );
-  }
-
+  // Loading
   if (loading) {
     return (
       <div className="animate-pulse space-y-6">
@@ -141,7 +147,7 @@ function DetailContent() {
           </div>
         </div>
         <div className="space-y-3">
-          {[1, 2, 3, 4].map(i => (
+          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
             <div key={i} className="h-16 bg-white/5 rounded-xl"></div>
           ))}
         </div>
@@ -149,6 +155,19 @@ function DetailContent() {
     );
   }
 
+  // No URL
+  if (!url) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+          <span className="text-2xl">⚠️</span>
+        </div>
+        <p className="text-white/40 font-mono text-sm">URL tidak ditemukan</p>
+      </div>
+    );
+  }
+
+  // No detail
   if (!detail) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -156,14 +175,15 @@ function DetailContent() {
           <span className="text-2xl">📭</span>
         </div>
         <p className="text-white/40 font-mono text-sm">Gagal memuat data</p>
+        <button
+          onClick={handleRefresh}
+          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-white text-sm transition-all"
+        >
+          Coba Lagi
+        </button>
       </div>
     );
   }
-
-  const getImageUrl = (thumbnail: string) => {
-    if (!thumbnail) return null;
-    return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
-  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -172,7 +192,6 @@ function DetailContent() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         
         <div className="relative flex flex-col md:flex-row gap-6">
-          {/* Thumbnail */}
           <div className="w-48 aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-white/10 bg-white/5 mx-auto md:mx-0 relative">
             {detail.thumbnail ? (
               <>
@@ -199,7 +218,6 @@ function DetailContent() {
           </div>
 
           <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
-            {/* Status Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-medium mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
               {detail.status || 'Ongoing'}
@@ -212,7 +230,6 @@ function DetailContent() {
               {detail.author || 'Unknown Author'}
             </p>
             
-            {/* Stats */}
             <div className="flex flex-wrap items-center gap-3 mb-4 justify-center md:justify-start">
               {detail.genre && (
                 <span className="px-3 py-1 rounded-full bg-white/5 text-white/60 text-xs font-mono">
@@ -243,7 +260,6 @@ function DetailContent() {
               {detail.synopsis || 'Tidak ada sinopsis tersedia.'}
             </p>
 
-            {/* Tombol Favorit */}
             <button
               onClick={toggleFavorite}
               className={`mt-4 flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${
@@ -268,12 +284,16 @@ function DetailContent() {
             <BookOpen size={18} className="text-blue-400" />
             <h2 className="text-lg font-bold text-white">Daftar Episode</h2>
             <span className="text-[10px] font-mono text-white/30 bg-white/5 px-2 py-0.5 rounded">
-              {detail.count || episodes.length}
+              {totalEpisodes || episodes.length}
             </span>
+            {usingScrape && (
+              <span className="text-[8px] font-mono text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded">
+                ALL
+              </span>
+            )}
           </div>
           
           <div className="flex items-center gap-2">
-            {/* Tombol Refresh / Update */}
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
@@ -291,10 +311,24 @@ function DetailContent() {
           </div>
         </div>
 
+        {/* Error */}
+        {scrapeError && (
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm mb-4">
+            <AlertCircle size={16} />
+            {scrapeError}
+          </div>
+        )}
+
         <div className="space-y-2">
-          {episodes.length === 0 && !loading ? (
+          {episodes.length === 0 ? (
             <div className="p-8 text-center text-white/30">
               <p>Tidak ada episode ditemukan</p>
+              <button
+                onClick={handleRefresh}
+                className="mt-2 text-blue-400 hover:text-blue-300 text-sm transition-colors"
+              >
+                Coba Refresh
+              </button>
             </div>
           ) : (
             episodes.map((ep: any, idx: number) => (
@@ -304,22 +338,6 @@ function DetailContent() {
                 className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 transition-all duration-300 group"
               >
                 <div className="w-16 aspect-video rounded-lg overflow-hidden bg-white/5 relative shrink-0">
-                  {ep.thumbnail ? (
-                    <Image 
-                      src={`/api/image-proxy?url=${encodeURIComponent(ep.thumbnail)}`} 
-                      alt={ep.title} 
-                      fill
-                      unoptimized
-                      className="object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white/10 text-xs">
-                      No img
-                    </div>
-                  )}
                   <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-blue-600 text-white text-[8px] font-bold">
                     #{ep.episodeNo || idx + 1}
                   </div>
@@ -331,17 +349,6 @@ function DetailContent() {
                   </h3>
                   <div className="flex items-center gap-3 text-xs text-white/30 mt-0.5">
                     {ep.date && <span>{ep.date}</span>}
-                    {ep.likes && (
-                      <span className="flex items-center gap-1">
-                        <Heart size={10} className="text-pink-400" fill="currentColor" />
-                        {ep.likes}
-                      </span>
-                    )}
-                    {ep.isNew && (
-                      <span className="text-[8px] font-bold text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded">
-                        NEW
-                      </span>
-                    )}
                   </div>
                 </div>
                 
@@ -354,31 +361,12 @@ function DetailContent() {
             ))
           )}
         </div>
-
-        {hasMore && (
-          <button 
-            onClick={loadMore}
-            disabled={loadingMore}
-            className="w-full mt-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white font-medium transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loadingMore ? (
-              <>
-                <span className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
-                Memuat...
-              </>
-            ) : (
-              <>
-                <span>Muat Lebih Banyak</span>
-                <ChevronDown size={16} />
-              </>
-            )}
-          </button>
-        )}
         
-        {/* Info total episode */}
-        {detail.count && (
+        {episodes.length > 0 && (
           <div className="text-center text-[10px] font-mono text-white/20 mt-4">
-            Menampilkan {episodes.length} dari {detail.count} episode
+            Menampilkan {episodes.length} episode
+            {usingScrape && ' (semua episode)'}
+            {!usingScrape && ' (terbaru)'}
           </div>
         )}
       </div>
