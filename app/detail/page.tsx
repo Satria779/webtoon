@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ChevronDown, ImageOff } from 'lucide-react';
+import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ChevronDown, ImageOff, RefreshCw } from 'lucide-react';
 
 function DetailContent() {
   const searchParams = useSearchParams();
@@ -18,25 +18,47 @@ function DetailContent() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Fungsi fetch data
+  const fetchData = async (pageNum: number, isRefresh = false) => {
+    if (!url) return;
+    
+    if (isRefresh) {
+      setIsRefreshing(true);
+    }
+    
+    try {
+      const res = await fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=${pageNum}`);
+      const data = await res.json();
+      
+      if (pageNum === 1) {
+        setDetail(data);
+        setEpisodes(data.episodesList || []);
+        setLastUpdated(new Date().toLocaleString('id-ID'));
+      } else {
+        setEpisodes(prev => [...prev, ...(data.episodesList || [])]);
+      }
+      
+      setHasMore(data.hasNext);
+      setPage(pageNum);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  // Load awal
   useEffect(() => {
     if (!url) return;
     setLoading(true);
-    fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=1`)
-      .then(res => res.json())
-      .then(data => {
-        setDetail(data);
-        setEpisodes(data.episodesList || []);
-        setHasMore(data.hasNext);
-        setPage(1);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    fetchData(1);
   }, [url]);
 
+  // Cek favorit
   useEffect(() => {
     if (detail) {
       const saved = localStorage.getItem('komik2_favorites');
@@ -49,6 +71,13 @@ function DetailContent() {
       }
     }
   }, [detail, url]);
+
+  // Refresh / Update
+  const handleRefresh = () => {
+    if (!url) return;
+    setEpisodes([]);
+    fetchData(1, true);
+  };
 
   const toggleFavorite = () => {
     if (!detail) return;
@@ -138,10 +167,12 @@ function DetailContent() {
 
   return (
     <div className="flex flex-col gap-8">
+      {/* HEADER INFO */}
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white/5 to-transparent border border-white/5 p-6 md:p-8">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         
         <div className="relative flex flex-col md:flex-row gap-6">
+          {/* Thumbnail */}
           <div className="w-48 aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-white/10 bg-white/5 mx-auto md:mx-0 relative">
             {detail.thumbnail ? (
               <>
@@ -168,6 +199,7 @@ function DetailContent() {
           </div>
 
           <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
+            {/* Status Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-medium mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
               {detail.status || 'Ongoing'}
@@ -180,6 +212,7 @@ function DetailContent() {
               {detail.author || 'Unknown Author'}
             </p>
             
+            {/* Stats */}
             <div className="flex flex-wrap items-center gap-3 mb-4 justify-center md:justify-start">
               {detail.genre && (
                 <span className="px-3 py-1 rounded-full bg-white/5 text-white/60 text-xs font-mono">
@@ -210,6 +243,7 @@ function DetailContent() {
               {detail.synopsis || 'Tidak ada sinopsis tersedia.'}
             </p>
 
+            {/* Tombol Favorit */}
             <button
               onClick={toggleFavorite}
               className={`mt-4 flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${
@@ -227,68 +261,98 @@ function DetailContent() {
         </div>
       </div>
 
+      {/* EPISODE LIST */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <BookOpen size={18} className="text-blue-400" />
             <h2 className="text-lg font-bold text-white">Daftar Episode</h2>
+            <span className="text-[10px] font-mono text-white/30 bg-white/5 px-2 py-0.5 rounded">
+              {detail.count || episodes.length}
+            </span>
           </div>
-          <span className="text-xs font-mono text-white/30 bg-white/5 px-3 py-1 rounded-full">
-            {detail.count || episodes.length} episode
-          </span>
+          
+          <div className="flex items-center gap-2">
+            {/* Tombol Refresh / Update */}
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 text-xs transition-all duration-300 disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+              {isRefreshing ? 'Update...' : 'Cek Update'}
+            </button>
+            
+            {lastUpdated && (
+              <span className="text-[10px] font-mono text-white/20">
+                {lastUpdated}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="space-y-2">
-          {episodes.map((ep: any, idx: number) => (
-            <Link 
-              key={idx}
-              href={`/read?url=${encodeURIComponent(ep.url)}`}
-              className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 transition-all duration-300 group"
-            >
-              <div className="w-16 aspect-video rounded-lg overflow-hidden bg-white/5 relative shrink-0">
-                {ep.thumbnail ? (
-                  <Image 
-                    src={`/api/image-proxy?url=${encodeURIComponent(ep.thumbnail)}`} 
-                    alt={ep.title} 
-                    fill
-                    unoptimized
-                    className="object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white/10 text-xs">
-                    No img
-                  </div>
-                )}
-                <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-blue-600 text-white text-[8px] font-bold">
-                  #{ep.episodeNo || idx + 1}
-                </div>
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-white truncate group-hover:text-blue-400 transition-colors text-sm">
-                  {ep.title || `Episode ${idx + 1}`}
-                </h3>
-                <div className="flex items-center gap-3 text-xs text-white/30 mt-0.5">
-                  {ep.date && <span>{ep.date}</span>}
-                  {ep.likes && (
-                    <span className="flex items-center gap-1">
-                      <Heart size={10} className="text-pink-400" fill="currentColor" />
-                      {ep.likes}
-                    </span>
+          {episodes.length === 0 && !loading ? (
+            <div className="p-8 text-center text-white/30">
+              <p>Tidak ada episode ditemukan</p>
+            </div>
+          ) : (
+            episodes.map((ep: any, idx: number) => (
+              <Link 
+                key={idx}
+                href={`/read?url=${encodeURIComponent(ep.url)}`}
+                className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 transition-all duration-300 group"
+              >
+                <div className="w-16 aspect-video rounded-lg overflow-hidden bg-white/5 relative shrink-0">
+                  {ep.thumbnail ? (
+                    <Image 
+                      src={`/api/image-proxy?url=${encodeURIComponent(ep.thumbnail)}`} 
+                      alt={ep.title} 
+                      fill
+                      unoptimized
+                      className="object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white/10 text-xs">
+                      No img
+                    </div>
                   )}
+                  <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-blue-600 text-white text-[8px] font-bold">
+                    #{ep.episodeNo || idx + 1}
+                  </div>
                 </div>
-              </div>
-              
-              <div className="text-white/20 group-hover:text-blue-400 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
-          ))}
+                
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-white truncate group-hover:text-blue-400 transition-colors text-sm">
+                    {ep.title || `Episode ${idx + 1}`}
+                  </h3>
+                  <div className="flex items-center gap-3 text-xs text-white/30 mt-0.5">
+                    {ep.date && <span>{ep.date}</span>}
+                    {ep.likes && (
+                      <span className="flex items-center gap-1">
+                        <Heart size={10} className="text-pink-400" fill="currentColor" />
+                        {ep.likes}
+                      </span>
+                    )}
+                    {ep.isNew && (
+                      <span className="text-[8px] font-bold text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded">
+                        NEW
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="text-white/20 group-hover:text-blue-400 transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))
+          )}
         </div>
 
         {hasMore && (
@@ -309,6 +373,13 @@ function DetailContent() {
               </>
             )}
           </button>
+        )}
+        
+        {/* Info total episode */}
+        {detail.count && (
+          <div className="text-center text-[10px] font-mono text-white/20 mt-4">
+            Menampilkan {episodes.length} dari {detail.count} episode
+          </div>
         )}
       </div>
     </div>
