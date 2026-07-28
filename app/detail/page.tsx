@@ -1,17 +1,17 @@
-'gunakan klien';
+'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-impor { gunakan SearchParams } dari 'next/navigation';
-impor tautan dari 'next/link';
-impor Gambar dari 'next/image';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Star, Heart, Clock, Users, BookOpen, ChevronDown, ImageOff } from 'lucide-react';
 
-fungsi DetailContent() {
+function DetailContent() {
   const searchParams = useSearchParams();
   const url = searchParams.get('url');
   
   const [detail, setDetail] = useState<any>(null);
-  const [episode, setEpisode] = useState<any[]>([]);
+  const [episodes, setEpisodes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -20,9 +20,9 @@ fungsi DetailContent() {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    jika (!url) kembalikan;
+    if (!url) return;
     setLoading(true);
-    ambil(`/api/episodes?url=${encodeURIComponent(url)}&page=1`)
+    fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=1`)
       .then(res => res.json())
       .then(data => {
         setDetail(data);
@@ -32,38 +32,38 @@ fungsi DetailContent() {
         setLoading(false);
       })
       .catch(err => {
-        konsol.error(err);
+        console.error(err);
         setLoading(false);
       });
   }, [url]);
 
   useEffect(() => {
-    jika (detail) {
+    if (detail) {
       const saved = localStorage.getItem('komik2_favorites');
-      jika (tersimpan) {
-        mencoba {
+      if (saved) {
+        try {
           const favs = JSON.parse(saved);
           const exists = favs.some((item: any) => item.url === url);
-          setIsFavorit(exists);
-        } menangkap {}
+          setIsFavorite(exists);
+        } catch {}
       }
     }
   }, [detail, url]);
 
   const toggleFavorite = () => {
-    jika (!detail) kembalikan;
+    if (!detail) return;
     
     const saved = localStorage.getItem('komik2_favorites');
     let favs = saved ? JSON.parse(saved) : [];
     
-    jika (isFavorit) {
+    if (isFavorite) {
       favs = favs.filter((item: any) => item.url !== url);
-    } kalau tidak {
-      favorit.push({
-        URL: URL,
-        judul: detail.judul,
+    } else {
+      favs.push({
+        url: url,
+        title: detail.title,
         thumbnail: detail.thumbnail,
-        genre: detail.genre || 'Umum',
+        genre: detail.genre || 'General',
       });
     }
     
@@ -72,10 +72,10 @@ fungsi DetailContent() {
   };
 
   const loadMore = () => {
-    Jika (!url || !hasMore || loadingMore) kembalikan;
+    if (!url || !hasMore || loadingMore) return;
     setLoadingMore(true);
     const nextPage = page + 1;
-    ambil(`/api/episodes?url=${encodeURIComponent(url)}&page=${nextPage}`)
+    fetch(`/api/episodes?url=${encodeURIComponent(url)}&page=${nextPage}`)
       .then(res => res.json())
       .then(data => {
         setEpisodes(prev => [...prev, ...(data.episodesList || [])]);
@@ -84,24 +84,24 @@ fungsi DetailContent() {
         setLoadingMore(false);
       })
       .catch(err => {
-        konsol.error(err);
+        console.error(err);
         setLoadingMore(false);
       });
   };
 
-  jika (!url) {
-    kembali (
+  if (!url) {
+    return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-          <span className="text-2xl">âš ï¸ </span>
+          <span className="text-2xl">⚠️</span>
         </div>
         <p className="text-white/40 font-mono text-sm">URL tidak ditemukan</p>
       </div>
     );
   }
 
-  jika (sedang memuat) {
-    kembali (
+  if (loading) {
+    return (
       <div className="animate-pulse space-y-6">
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-48 aspect-[3/4] rounded-xl bg-white/5 shrink-0 mx-auto md:mx-0"></div>
@@ -120,11 +120,11 @@ fungsi DetailContent() {
     );
   }
 
-  jika (!detail) {
-    kembali (
+  if (!detail) {
+    return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mb-4">
-          <span className="text-2xl">ðŸ“</span>
+          <span className="text-2xl">📭</span>
         </div>
         <p className="text-white/40 font-mono text-sm">Gagal memuat data</p>
       </div>
@@ -132,11 +132,11 @@ fungsi DetailContent() {
   }
 
   const getImageUrl = (thumbnail: string) => {
-    jika (!thumbnail) kembalikan null;
-    kembalikan `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
+    if (!thumbnail) return null;
+    return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
   };
 
-  kembali (
+  return (
     <div className="flex flex-col gap-8">
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white/5 to-transparent border border-white/5 p-6 md:p-8">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -145,12 +145,12 @@ fungsi DetailContent() {
           <div className="w-48 aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-white/10 bg-white/5 mx-auto md:mx-0 relative">
             {detail.thumbnail ? (
               <>
-                <Gambar>
-                  src={getImageUrl(detail.thumbnail) || ''}
-                  alt={detail.title}
-                  mengisi
-                  tidak dioptimalkan
-                  className="penutup-objek"
+                <Image 
+                  src={getImageUrl(detail.thumbnail) || ''} 
+                  alt={detail.title} 
+                  fill
+                  unoptimized
+                  className="object-cover"
                   onError={() => setImageError(true)}
                 />
                 {imageError && (
@@ -162,7 +162,7 @@ fungsi DetailContent() {
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center text-white/20 text-sm">
-                Tidak ada biaya
+                No Cover
               </div>
             )}
           </div>
@@ -170,14 +170,14 @@ fungsi DetailContent() {
           <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-medium mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-              {detail.status || 'Sedang Berlangsung'}
+              {detail.status || 'Ongoing'}
             </div>
             
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-1 leading-tight">
-              {detail.judul}
+              {detail.title}
             </h1>
             <p className="text-white/40 font-mono text-sm mb-4">
-              {detail.author || 'Penulis Tidak Dikenal'}
+              {detail.author || 'Unknown Author'}
             </p>
             
             <div className="flex flex-wrap items-center gap-3 mb-4 justify-center md:justify-start">
@@ -192,35 +192,35 @@ fungsi DetailContent() {
                   {detail.rating}
                 </span>
               )}
-              {detail.pelanggan && (
+              {detail.subscribers && (
                 <span className="flex items-center gap-1 text-white/40 text-sm">
-                  <Pengguna ukuran={14} />
-                  {detail.pelanggan}
+                  <Users size={14} />
+                  {detail.subscribers}
                 </span>
               )}
-              {detail.hari && (
+              {detail.day && (
                 <span className="flex items-center gap-1 text-blue-400 text-sm">
-                  <Jam ukuran={14} />
-                  {detail.hari}
+                  <Clock size={14} />
+                  {detail.day}
                 </span>
               )}
             </div>
 
             <p className="text-sm text-white/60 leading-relaxed max-w-2xl border-l-2 border-blue-500/30 pl-4">
-              {detail.sinopsis || 'Tidak ada sinopsis yang tersedia.'}
+              {detail.synopsis || 'Tidak ada sinopsis tersedia.'}
             </p>
 
-            <tombol>
+            <button
               onClick={toggleFavorite}
               className={`mt-4 flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                adalahFavorit
-                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30'
+                isFavorite 
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30' 
                   : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/10'
               }`}
             >
               <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
               <span className="text-sm font-medium">
-                {adalah Favorit? 'Favorit' : 'Tambah Favorit'}
+                {isFavorite ? 'Favorit' : 'Tambah Favorit'}
               </span>
             </button>
           </div>
@@ -231,35 +231,35 @@ fungsi DetailContent() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <BookOpen size={18} className="text-blue-400" />
-            <h2 className="text-lg font-bold text-white">Episode Daftar</h2>
+            <h2 className="text-lg font-bold text-white">Daftar Episode</h2>
           </div>
           <span className="text-xs font-mono text-white/30 bg-white/5 px-3 py-1 rounded-full">
-            {jumlah detail || panjang episode} episode
+            {detail.count || episodes.length} episode
           </span>
         </div>
 
         <div className="space-y-2">
           {episodes.map((ep: any, idx: number) => (
-            <Tautan>
-              kunci={idx}
+            <Link 
+              key={idx}
               href={`/read?url=${encodeURIComponent(ep.url)}`}
               className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 transition-all duration-300 group"
             >
               <div className="w-16 aspect-video rounded-lg overflow-hidden bg-white/5 relative shrink-0">
                 {ep.thumbnail ? (
-                  <Gambar>
-                    src={`/api/image-proxy?url=${encodeURIComponent(ep.thumbnail)}`}
-                    alt={ep.title}
-                    mengisi
-                    tidak dioptimalkan
-                    className="penutup-objek"
+                  <Image 
+                    src={`/api/image-proxy?url=${encodeURIComponent(ep.thumbnail)}`} 
+                    alt={ep.title} 
+                    fill
+                    unoptimized
+                    className="object-cover"
                     onError={(e) => {
-                      (e.target sebagai HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-white/10 text-xs">
-                    Tidak ada gambar
+                    No img
                   </div>
                 )}
                 <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-blue-600 text-white text-[8px] font-bold">
@@ -275,7 +275,7 @@ fungsi DetailContent() {
                   {ep.date && <span>{ep.date}</span>}
                   {ep.likes && (
                     <span className="flex items-center gap-1">
-                      <Hati ukuran={10} className="teks-merah muda-400" isi="warna saat ini" />
+                      <Heart size={10} className="text-pink-400" fill="currentColor" />
                       {ep.likes}
                     </span>
                   )}
@@ -292,9 +292,9 @@ fungsi DetailContent() {
         </div>
 
         {hasMore && (
-          <tombol>
+          <button 
             onClick={loadMore}
-            dinonaktifkan={memuatlebihbanyak}
+            disabled={loadingMore}
             className="w-full mt-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white font-medium transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loadingMore ? (
@@ -315,12 +315,12 @@ fungsi DetailContent() {
   );
 }
 
-ekspor fungsi default DetailPage() {
-  kembali (
+export default function DetailPage() {
+  return (
     <div className="min-h-screen flex flex-col bg-[#0a0a0a] pb-24 md:pb-8">
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 px-4 md:px-6 py-3 flex items-center gap-4">
-        <tombol>
-          onClick={() => window.history.back()}
+        <button 
+          onClick={() => window.history.back()} 
           className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60 hover:text-white"
         >
           <ArrowLeft size={20} />
@@ -329,18 +329,18 @@ ekspor fungsi default DetailPage() {
           <BookOpen size={16} className="text-blue-400" />
           <span className="text-sm font-medium text-white">Detail</span>
         </div>
-        KOMIK2 •</span>
+        <span className="text-xs font-mono text-white/20 ml-auto">• KOMIK2 •</span>
       </header>
       
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 md:px-6 py-6">
         <Suspense fallback={
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-white/30 text-sm mt-4 font-mono">Ingat data...</p>
+            <p className="text-white/30 text-sm mt-4 font-mono">Memuat data...</p>
           </div>
         }>
           <DetailContent />
-        </Ketegangan>
+        </Suspense>
       </main>
     </div>
   );
