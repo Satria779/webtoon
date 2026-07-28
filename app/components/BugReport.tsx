@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Send, Mail, AlertCircle, CheckCircle } from 'lucide-react';
+import { Bug, X, Send, Mail, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface BugReportProps {
   isOpen?: boolean;
@@ -18,7 +18,6 @@ export default function BugReport({ isOpen: externalIsOpen, onClose }: BugReport
   const [error, setError] = useState('');
   const [isMounted, setIsMounted] = useState(false);
 
-  // Pake external atau internal
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const setIsOpen = (val: boolean) => {
     if (externalIsOpen !== undefined && onClose) {
@@ -89,7 +88,7 @@ Dilaporkan dari aplikasi KOMIK2
         <div className="flex items-center justify-between p-4 border-b border-white/10 sticky top-0 bg-[#0a0a0a] z-10">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-blue-500/20">
-              <span className="text-blue-400">🐞</span>
+              <Bug size={18} className="text-blue-400" />
             </div>
             <h2 className="text-lg font-bold text-white">Lapor Bug</h2>
           </div>
