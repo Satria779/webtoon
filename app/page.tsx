@@ -97,7 +97,7 @@ export default function Home() {
             <div className="p-2 rounded-lg bg-red-500/10">
               <Flame className="text-red-400" size={22} />
             </div>
-            <h2 className="text-xl font-bold text-white">Action Trending 🔥</h2>
+            <h2 className="text-xl font-bold text-white">Action Trending</h2>
             <span className="text-xs font-mono text-white/30 ml-auto">• ACTION •</span>
           </div>
           
